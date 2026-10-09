@@ -1,5 +1,6 @@
 # MLSecOps: AI Model Supply Chain & Malicious Deserialization Scanner
 
+[![Live Portal](https://img.shields.io/badge/Live%20Portal-Vercel%20Deployed-000000?style=flat&logo=vercel&logoColor=white)](https://ml-sec-ops-ai-model-supply-chain-ma-eight.vercel.app)
 [![CI Pipeline](https://github.com/ravishkarathnayaka/MLSecOps-AI-Model-Supply-Chain-Malicious-Deserialization-Scanne/actions/workflows/ci.yml/badge.svg)](https://github.com/ravishkarathnayaka/MLSecOps-AI-Model-Supply-Chain-Malicious-Deserialization-Scanne/actions/workflows/ci.yml)
 [![Security Scan](https://github.com/ravishkarathnayaka/MLSecOps-AI-Model-Supply-Chain-Malicious-Deserialization-Scanne/actions/workflows/security-scan.yml/badge.svg)](https://github.com/ravishkarathnayaka/MLSecOps-AI-Model-Supply-Chain-Malicious-Deserialization-Scanne/actions/workflows/security-scan.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -381,7 +382,10 @@ curl -X POST http://localhost:8080/v1/models/load \
 
 ## 10. Interactive Security Portal & Vercel Deployment
 
-A zero-backend client-side static security inspection portal is provided in `portal/`. It delivers real-time browser-based static disassembly, synthetic sample audits, SARIF export, and admission webhook simulations with zero server requirements.
+An interactive client-side static security inspection portal is live in production:
+🔗 **Live Demo:** [https://ml-sec-ops-ai-model-supply-chain-ma-eight.vercel.app](https://ml-sec-ops-ai-model-supply-chain-ma-eight.vercel.app)
+
+It delivers real-time browser-based static disassembly, synthetic sample audits, SARIF export, and admission webhook simulations with zero server requirements.
 
 ### Deploying to Vercel
 
