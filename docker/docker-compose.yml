@@ -1,0 +1,113 @@
+services:
+  # 1. MLSecOps Admission Controller Webhook & Scanner API
+  scanner-api:
+    build:
+      context: ..
+      dockerfile: admission_gate/Dockerfile
+    container_name: mlsecops-scanner-api
+    restart: unless-stopped
+    ports:
+      - "${SCANNER_PORT:-8000}:8000"
+    environment:
+      - REDIS_URL=redis://${REDIS_HOST:-redis}:${REDIS_PORT:-6379}/0
+      - FAIL_ON_THRESHOLD=${FAIL_ON_THRESHOLD:-high}
+      - STRICT_MODE=${STRICT_MODE:-false}
+    volumes:
+      - ../models:/data/models:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - redis
+    networks:
+      - mlsecops-net
+
+  # 2. Redis Cache & Metrics Store
+  redis:
+    image: redis:7-alpine
+    container_name: mlsecops-redis-cache
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - mlsecops-net
+
+  # 3. Mock Inference Server (Simulating KServe / vLLM admission flow)
+  mock-inference-server:
+    image: python:3.12-slim
+    container_name: mock-inference-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../test_models:/models:ro
+    command: >
+      python -c '
+      import http.server, socketserver, json, urllib.request
+
+      class InferenceHandler(http.server.SimpleHTTPRequestHandler):
+          def do_POST(self):
+              if self.path == "/v1/models/load":
+                  length = int(self.headers.get("Content-Length", 0))
+                  body = json.loads(self.rfile.read(length))
+                  model_path = body.get("model_path", "/models/safe_model.safetensors")
+                  
+                  # Query scanner-api admission gatekeeper
+                  review_req = json.dumps({"model_uri": model_path, "fail_on": "high"}).encode("utf-8")
+                  req = urllib.request.Request("http://scanner-api:8000/v1/admission/review",
+                                               data=review_req,
+                                               headers={"Content-Type": "application/json"})
+                  try:
+                      with urllib.request.urlopen(req) as resp:
+                          res_data = json.loads(resp.read().decode())
+                          if not res_data.get("allowed", False):
+                              self.send_response(403)
+                              self.send_header("Content-Type", "application/json")
+                              self.end_headers()
+                              self.wfile.write(json.dumps({"error": "Admission Denied: Malicious Model Blocked", "details": res_data}).encode())
+                              return
+                  except Exception as e:
+                      self.send_response(502)
+                      self.end_headers()
+                      self.wfile.write(json.dumps({"error": f"Scanner unreachable: {str(e)}"}).encode())
+                      return
+
+                  self.send_response(200)
+                  self.send_header("Content-Type", "application/json")
+                  self.end_headers()
+                  self.wfile.write(json.dumps({"status": "Model successfully verified and loaded into inference memory", "model": model_path}).encode())
+              else:
+                  self.send_response(404)
+                  self.end_headers()
+
+          def do_GET(self):
+              self.send_response(200)
+              self.send_header("Content-Type", "application/json")
+              self.end_headers()
+              self.wfile.write(json.dumps({"status": "mock-inference-runtime-active"}).encode())
+
+      with socketserver.TCPServer(("", 8080), InferenceHandler) as httpd:
+          print("Mock inference runtime listening on :8080")
+          httpd.serve_forever()
+      '
+    depends_on:
+      scanner-api:
+        condition: service_healthy
+    networks:
+      - mlsecops-net
+
+networks:
+  mlsecops-net:
+    driver: bridge
+
+volumes:
+  redis_data:
