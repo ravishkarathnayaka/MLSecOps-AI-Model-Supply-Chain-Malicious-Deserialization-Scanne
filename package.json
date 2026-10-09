@@ -1,0 +1,11 @@
+{
+  "name": "mlsecops-scanner-showcase",
+  "version": "1.0.0",
+  "description": "MLSecOps AI Model Supply Chain & Malicious Deserialization Scanner Showcase",
+  "scripts": {
+    "build": "echo Static portal build complete",
+    "dev": "npx serve -l 3000 portal",
+    "start": "npx serve -l 3000 portal"
+  },
+  "license": "MIT"
+}

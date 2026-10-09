@@ -1,0 +1,12 @@
+{
+  "name": "mlsecops-scanner-portal",
+  "version": "1.0.0",
+  "description": "Interactive showcase portal for MLSecOps Model Supply Chain Scanner",
+  "scripts": {
+    "build": "echo Static portal build complete",
+    "dev": "npx serve -l 3000 .",
+    "start": "npx serve -l 3000 ."
+  },
+  "keywords": ["mlsecops", "security", "ai", "model-scanner", "deserialization", "sarif"],
+  "license": "MIT"
+}
