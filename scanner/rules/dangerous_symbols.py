@@ -331,6 +331,75 @@ DANGEROUS_CALLABLES: Dict[Tuple[str, str], SymbolRule] = {
         category="reflection",
         description="Mutates object attributes dynamically at runtime.",
     ),
+    ("builtins", "__build_class__"): SymbolRule(
+        module="builtins",
+        name="__build_class__",
+        severity=RiskLevel.CRITICAL,
+        category="reflection",
+        description="Dynamic runtime class construction primitive.",
+    ),
+
+    # Multiprocessing and Subprocess Primitives
+    ("multiprocessing", "Process"): SymbolRule(
+        module="multiprocessing",
+        name="Process",
+        severity=RiskLevel.CRITICAL,
+        category="process_spawning",
+        description="Spawns concurrent background OS processes.",
+    ),
+    ("asyncio", "create_subprocess_exec"): SymbolRule(
+        module="asyncio",
+        name="create_subprocess_exec",
+        severity=RiskLevel.CRITICAL,
+        category="process_spawning",
+        description="Asynchronously executes OS binary in child process.",
+    ),
+    ("asyncio", "create_subprocess_shell"): SymbolRule(
+        module="asyncio",
+        name="create_subprocess_shell",
+        severity=RiskLevel.CRITICAL,
+        category="process_spawning",
+        description="Asynchronously runs shell command string.",
+    ),
+
+    # Low-level Native and Dynamic Memory Primitives
+    ("ctypes", "CDLL"): SymbolRule(
+        module="ctypes",
+        name="CDLL",
+        severity=RiskLevel.CRITICAL,
+        category="native_code_execution",
+        description="Loads arbitrary C dynamic libraries (.so/.dll) directly into memory.",
+    ),
+    ("marshal", "loads"): SymbolRule(
+        module="marshal",
+        name="loads",
+        severity=RiskLevel.CRITICAL,
+        category="arbitrary_code_execution",
+        description="Deserializes raw Python bytecode code objects.",
+    ),
+    ("shelve", "open"): SymbolRule(
+        module="shelve",
+        name="open",
+        severity=RiskLevel.HIGH,
+        category="secondary_deserialization",
+        description="Opens persistent shelf storage triggering nested pickle loads.",
+    ),
+    ("dill", "loads"): SymbolRule(
+        module="dill",
+        name="loads",
+        severity=RiskLevel.CRITICAL,
+        category="arbitrary_code_execution",
+        description="Dill deserializer capable of serializing arbitrary code and lambdas.",
+    ),
+
+    # Advanced Network Hooks
+    ("socket", "create_server"): SymbolRule(
+        module="socket",
+        name="create_server",
+        severity=RiskLevel.CRITICAL,
+        category="network_exfiltration",
+        description="Binds and listens on network ports creating a backdoor server.",
+    ),
 
     # Benign Synthetic Test Payload Callables
     ("builtins", "print"): SymbolRule(
@@ -348,6 +417,7 @@ DANGEROUS_MODULES: Dict[str, Tuple[RiskLevel, str]] = {
     "posix": (RiskLevel.CRITICAL, "POSIX low-level OS primitives"),
     "nt": (RiskLevel.CRITICAL, "Windows NT low-level OS primitives"),
     "subprocess": (RiskLevel.CRITICAL, "Process creation and shell execution module"),
+    "multiprocessing": (RiskLevel.CRITICAL, "Multiprocessing and process worker module"),
     "pty": (RiskLevel.CRITICAL, "Pseudo-terminal control module"),
     "socket": (RiskLevel.CRITICAL, "Low-level networking and socket interface"),
     "commands": (RiskLevel.CRITICAL, "Legacy shell execution module"),
@@ -358,6 +428,10 @@ DANGEROUS_MODULES: Dict[str, Tuple[RiskLevel, str]] = {
     "ftplib": (RiskLevel.HIGH, "FTP client module"),
     "webbrowser": (RiskLevel.HIGH, "System browser launcher"),
     "importlib": (RiskLevel.HIGH, "Dynamic module loading machinery"),
+    "marshal": (RiskLevel.CRITICAL, "Python internal object serialization module"),
+    "shelve": (RiskLevel.HIGH, "Python shelf object persistence module"),
+    "dill": (RiskLevel.CRITICAL, "Extended serialization module capable of arbitrary code packing"),
+    "asyncio": (RiskLevel.HIGH, "Asynchronous I/O runtime with subprocess spawning capabilities"),
     "inspect": (RiskLevel.MEDIUM, "Runtime code reflection and introspection"),
     "ctypes": (RiskLevel.CRITICAL, "Foreign function library allowing direct C memory access"),
     "code": (RiskLevel.HIGH, "Interactive interpreter and compilation machinery"),
