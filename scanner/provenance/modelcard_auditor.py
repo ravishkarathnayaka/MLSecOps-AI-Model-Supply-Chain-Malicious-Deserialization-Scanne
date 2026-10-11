@@ -57,7 +57,8 @@ class ModelCardAuditor:
         findings: List[Finding] = []
 
         # Extract YAML frontmatter enclosed in ---
-        yaml_match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
+        content_stripped = content.strip()
+        yaml_match = re.match(r"^---\s*\n(.*?)\n---", content_stripped, re.DOTALL)
         if not yaml_match:
             findings.append(
                 Finding(
@@ -122,7 +123,7 @@ class ModelCardAuditor:
         # 3. Verify declared hashes against weights if weights_path provided
         if weights_path and os.path.exists(weights_path):
             declared_sha256 = metadata.get("sha256")
-            if declared_sha256:
+            if declared_sha256 is not None:
                 hash_findings = HashVerifier.verify_against_expected(weights_path, expected_sha256=str(declared_sha256))
                 findings.extend(hash_findings)
 
