@@ -72,6 +72,15 @@ def get_metrics() -> Dict[str, Any]:
     }
 
 
+@app.get("/metrics/prometheus", tags=["System"])
+def get_prometheus_metrics():
+    from fastapi.responses import PlainTextResponse
+    from admission_gate.metrics_exporter import PrometheusMetricsExporter
+
+    content = PrometheusMetricsExporter.render_metrics(METRICS)
+    return PlainTextResponse(content, media_type="text/plain; version=0.0.4; charset=utf-8")
+
+
 @app.post("/v1/admission/review", response_model=AdmissionReviewResponse, tags=["Admission Gate"])
 def review_model(request: AdmissionReviewRequest) -> AdmissionReviewResponse:
     """
