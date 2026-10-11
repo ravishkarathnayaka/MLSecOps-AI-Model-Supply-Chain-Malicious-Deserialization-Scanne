@@ -114,29 +114,48 @@ flowchart TD
 ├── docker/
 │   ├── docker-compose.yml         # Local stack: Scanner API, Redis cache, and Mock Inference Server
 │   └── .env.example               # Environment variables template
+├── docs/
+│   ├── architecture.md            # Detailed multi-tier architectural specification
+│   ├── threat_model.md            # In-depth STRIDE analysis and supply-chain taxonomy
+│   └── kserve_guide.md            # Kubernetes KServe & vLLM admission gate integration
 ├── scanner/
 │   ├── __init__.py
 │   ├── core/
 │   │   ├── __init__.py
 │   │   ├── engine.py              # Master orchestration engine routing files to format-specific analyzers
-│   │   └── reporter.py            # Generates structured SARIF v2.1.0, JSON, and CLI terminal audit reports
+│   │   ├── parallel_scanner.py    # Multi-threaded parallel directory scanner
+│   │   ├── reporter.py            # Generates structured SARIF v2.1.0, JSON, and CLI terminal audit reports
+│   │   ├── html_reporter.py       # Self-contained interactive HTML dashboards
+│   │   ├── csv_reporter.py        # Flat tabular CSV export for SIEM ingestion
+│   │   └── github_summary.py      # GitHub Actions Step Summary Markdown generator
 │   ├── analyzers/
 │   │   ├── __init__.py
 │   │   ├── pickle_inspector.py    # Disassembles pickle bytecode (pickletools.genops) flagging unsafe globals/reduces
 │   │   ├── pytorch_analyzer.py    # Inspects PyTorch ZIP archives, manifests, zip slips, and inner pickle weights
 │   │   ├── onnx_analyzer.py       # Traverses ONNX graphs detecting custom domains and suspicious op types
-│   │   └── safetensors_checker.py # Validates Safetensors header JSON schema and verifies zero-executable guarantees
+│   │   ├── safetensors_checker.py # Validates Safetensors header JSON schema and verifies zero-executable guarantees
+│   │   ├── gguf_checker.py        # Quantized LLM (GGUF v2/v3) header and metadata key validator
+│   │   ├── keras_h5_analyzer.py   # Keras/HDF5 Lambda layer bytecode execution auditor
+│   │   └── entropy_analyzer.py    # Shannon entropy and steganography detection engine
 │   ├── rules/
 │   │   ├── __init__.py
 │   │   ├── dangerous_symbols.py   # Comprehensive denylist of dangerous execution symbols and module hierarchies
 │   │   └── policy_engine.py       # Evaluates findings against configurable severity thresholds (FAIL on Critical/High)
-│   └── provenance/
+│   ├── provenance/
+│   │   ├── __init__.py
+│   │   ├── hash_verifier.py       # Computes SHA256 / SHA512 and compares with Model Card metadata
+│   │   ├── signature_checker.py   # Validates detached signatures and in-toto / SLSA attestations
+│   │   └── modelcard_auditor.py   # Hugging Face README.md YAML frontmatter auditor
+│   └── integrations/
 │       ├── __init__.py
-│       ├── hash_verifier.py       # Computes SHA256 / SHA512 and compares with Model Card metadata
-│       └── signature_checker.py   # Validates detached signatures and in-toto / SLSA attestations
+│       └── huggingface.py         # Hugging Face Hub remote repository scanner
 ├── admission_gate/
 │   ├── __init__.py
 │   ├── webhook_server.py          # FastAPI admission controller intercepting model loading requests
+│   ├── cache.py                   # High-throughput Redis caching layer
+│   ├── kserve_adapter.py          # Kubernetes KServe v1beta1 AdmissionReview adapter
+│   ├── metrics_exporter.py        # Prometheus text format metrics exporter
+│   ├── k8s/                       # Kubernetes deployment and ValidatingWebhookConfiguration
 │   └── Dockerfile                 # Hardened non-root production container definition
 ├── cli/
 │   ├── __init__.py
