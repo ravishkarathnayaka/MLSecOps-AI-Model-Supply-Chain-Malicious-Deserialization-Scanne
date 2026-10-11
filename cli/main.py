@@ -31,9 +31,9 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--format",
         "-f",
-        choices=["text", "json", "sarif"],
+        choices=["text", "json", "sarif", "html", "csv", "github-summary"],
         default="text",
-        help="Report output format: text (terminal), json, or sarif (GitHub Code Scanning). Default: text.",
+        help="Report format: text, json, sarif, html, csv, or github-summary. Default: text.",
     )
     parser.add_argument(
         "--fail-on",
@@ -152,6 +152,18 @@ def run_cli(argv: Optional[List[str]] = None) -> int:
     elif args.format == "json":
         report_data = Reporter.to_json(evaluation, scanned_files)
         content = json.dumps(report_data, indent=2)
+    elif args.format == "html":
+        from scanner.core.html_reporter import HTMLReporter
+
+        content = HTMLReporter.generate_html(evaluation, scanned_files)
+    elif args.format == "csv":
+        from scanner.core.csv_reporter import CSVReporter
+
+        content = CSVReporter.to_csv_string(evaluation)
+    elif args.format == "github-summary":
+        from scanner.core.github_summary import GitHubStepSummaryReporter
+
+        content = GitHubStepSummaryReporter.render_markdown(evaluation, scanned_files)
     else:
         content = Reporter.to_terminal_text(evaluation, scanned_files, use_color=use_color)
 
