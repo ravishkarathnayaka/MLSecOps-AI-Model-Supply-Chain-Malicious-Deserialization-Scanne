@@ -1,0 +1,31 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: mlsecops-model-admission-webhook
+  labels:
+    app.kubernetes.io/name: mlsecops-admission-controller
+    app.kubernetes.io/part-of: mlsecops-pipeline
+webhooks:
+  - name: validate.model.mlsecops.io
+    rules:
+      - apiGroups: ["serving.kserve.io"]
+        apiVersions: ["v1beta1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["inferenceservices"]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        name: mlsecops-admission-service
+        namespace: mlsecops-system
+        path: "/v1/admission/review"
+        port: 8443
+      caBundle: "" # Injected by cert-manager
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 15
+    failurePolicy: Fail
+    namespaceSelector:
+      matchExpressions:
+        - key: mlsecops.io/scan-enforced
+          operator: In
+          values: ["true", "enabled"]

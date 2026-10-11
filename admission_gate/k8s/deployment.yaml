@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlsecops-admission-controller
+  namespace: mlsecops-system
+  labels:
+    app: mlsecops-admission-controller
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mlsecops-admission-controller
+  template:
+    metadata:
+      labels:
+        app: mlsecops-admission-controller
+    spec:
+      containers:
+        - name: webhook
+          image: ghcr.io/ravishkarathnayaka/mlsecops-scanner:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: REDIS_URL
+              value: "redis://redis-service.mlsecops-system.svc.cluster.local:6379/0"
+            - name: SCAN_STRICT_MODE
+              value: "false"
+            - name: FAIL_THRESHOLD
+              value: "high"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlsecops-admission-service
+  namespace: mlsecops-system
+spec:
+  selector:
+    app: mlsecops-admission-controller
+  ports:
+    - name: https
+      port: 8443
+      targetPort: 8000
