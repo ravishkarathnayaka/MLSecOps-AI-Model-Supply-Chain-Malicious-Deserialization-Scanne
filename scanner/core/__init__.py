@@ -3,6 +3,7 @@ Core orchestration and reporting modules for MLSecOps scanner.
 """
 
 from scanner.core.engine import ModelScanEngine
+from scanner.core.parallel_scanner import ParallelModelScanner
 from scanner.core.reporter import Reporter
 
-__all__ = ["ModelScanEngine", "Reporter"]
+__all__ = ["ModelScanEngine", "ParallelModelScanner", "Reporter"]
