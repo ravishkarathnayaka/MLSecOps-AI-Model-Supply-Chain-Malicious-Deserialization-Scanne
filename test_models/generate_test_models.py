@@ -181,6 +181,42 @@ def generate_custom_op_onnx(output_path: str) -> None:
         f.write(model_bytes)
 
 
+def generate_safe_gguf(output_path: str) -> None:
+    """Generates a compliant minimal GGUF v3 model."""
+    header = b"GGUF" + struct.pack("<IQQ", 3, 12, 0)
+    with open(output_path, "wb") as f:
+        f.write(header)
+
+
+def generate_safe_keras(output_path: str) -> None:
+    """Generates a clean Keras v3 zip archive with Dense layers."""
+    cfg = {"class_name": "Sequential", "config": {"layers": [{"class_name": "Dense"}]}}
+    with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("config.json", json.dumps(cfg))
+
+
+def generate_trojan_keras(output_path: str) -> None:
+    """Generates a Keras v3 model bundling a Lambda layer."""
+    import base64
+
+    cfg = {
+        "class_name": "Sequential",
+        "config": {
+            "layers": [
+                {
+                    "class_name": "Lambda",
+                    "config": {
+                        "name": "benign_probe_lambda",
+                        "function": [base64.b64encode(b"print('Benign Lambda Test')").decode()],
+                    },
+                }
+            ]
+        },
+    }
+    with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("config.json", json.dumps(cfg))
+
+
 def generate_all_test_models(target_dir: str = "test_models") -> None:
     """Generates all synthetic test models in the target directory."""
     os.makedirs(target_dir, exist_ok=True)
@@ -195,6 +231,9 @@ def generate_all_test_models(target_dir: str = "test_models") -> None:
         ("trojan_print.pt", generate_trojan_pytorch_pt),
         ("safe_model.onnx", generate_safe_onnx),
         ("custom_op.onnx", generate_custom_op_onnx),
+        ("safe_model.gguf", generate_safe_gguf),
+        ("safe_model.keras", generate_safe_keras),
+        ("lambda_trojan.keras", generate_trojan_keras),
     ]
 
     for fname, generator_fn in models:
