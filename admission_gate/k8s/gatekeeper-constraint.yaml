@@ -1,0 +1,31 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8smlsecopsmodelsafety
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sMLSecOpsModelSafety
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8smlsecopsmodelsafety
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "InferenceService"
+          storage_uri := input.review.object.spec.predictor.model.storageUri
+          endswith(lower(storage_uri), ".pkl")
+          msg := sprintf("InferenceService '%v' blocked: raw pickle weights (.pkl) are forbidden without MLSecOps static scan approval.", [input.review.object.metadata.name])
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sMLSecOpsModelSafety
+metadata:
+  name: enforce-mlsecops-admission
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["serving.kserve.io"]
+        kinds: ["InferenceService"]
