@@ -1,3 +1,3 @@
-"""
-MLSecOps Scanner Command Line Interface.
-"""
+from cli.dashboard import TerminalDashboard
+
+__all__ = ["TerminalDashboard"]
