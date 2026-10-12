@@ -1,0 +1,9 @@
+apiVersion: v2
+name: mlsecops-admission-controller
+description: Helm chart for MLSecOps Model Supply Chain Security Admission Webhook
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: MLSecOps Team
+    email: security@mlsecops.local

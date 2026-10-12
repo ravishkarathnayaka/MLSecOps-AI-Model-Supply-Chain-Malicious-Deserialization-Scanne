@@ -1,0 +1,28 @@
+replicaCount: 3
+
+image:
+  repository: ghcr.io/ravishkarathnayaka/mlsecops-scanner
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+service:
+  type: ClusterIP
+  port: 8443
+  targetPort: 8000
+
+redis:
+  enabled: true
+  url: "redis://redis-master:6379/0"
+
+scannerConfig:
+  failThreshold: "high"
+  strictMode: false
+  maxHeaderSizeBytes: 104857600
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
