@@ -3,6 +3,10 @@ MLSecOps Rules Package.
 Provides dangerous symbol denylists, safe allowlists, and policy evaluation engines.
 """
 
+from scanner.rules.backdoor_heuristics import (
+    BACKDOOR_HEURISTIC_RULES,
+    WeightAnomalyThresholds,
+)
 from scanner.rules.dangerous_symbols import (
     DANGEROUS_CALLABLES,
     DANGEROUS_MODULES,
@@ -21,6 +25,8 @@ __all__ = [
     "DANGEROUS_TORCHSCRIPT_OPS",
     "SAFE_ATEN_PREFIXES",
     "NETWORK_EXFILTRATION_RULES",
+    "BACKDOOR_HEURISTIC_RULES",
+    "WeightAnomalyThresholds",
     "RiskLevel",
     "SymbolRule",
     "PolicyEngine",
