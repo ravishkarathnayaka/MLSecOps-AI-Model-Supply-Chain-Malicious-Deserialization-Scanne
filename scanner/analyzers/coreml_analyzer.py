@@ -34,8 +34,9 @@ class CoreMLAnalyzer:
                 findings.append(
                     Finding(
                         rule_id="COREML-MANIFEST-CORRUPTED",
+                        title="CoreML Manifest Corrupted",
                         severity=RiskLevel.MEDIUM,
-                        message=f"Failed to parse CoreML Manifest.json: {e}",
+                        description=f"Failed to parse CoreML Manifest.json: {e}",
                         location=manifest_path,
                     )
                 )
@@ -49,8 +50,9 @@ class CoreMLAnalyzer:
                     findings.append(
                         Finding(
                             rule_id="COREML-UNTRUSTED-EXECUTABLE-ASSET",
+                            title="Untrusted Executable Asset in CoreML Package",
                             severity=RiskLevel.CRITICAL,
-                            message=f"CoreML package contains unauthorized executable or script asset: {rel_path}",
+                            description=f"CoreML package contains unauthorized executable or script asset: {rel_path}",
                             location=rel_path,
                         )
                     )
@@ -70,8 +72,9 @@ class CoreMLAnalyzer:
                             findings.append(
                                 Finding(
                                     rule_id="COREML-UNTRUSTED-EXECUTABLE-ASSET",
+                                    title="Untrusted Executable Asset in CoreML Archive",
                                     severity=RiskLevel.CRITICAL,
-                                    message=f"Embedded executable asset found in CoreML archive: {name}",
+                                    description=f"Embedded executable asset found in CoreML archive: {name}",
                                     location=f"{source_name}:{name}",
                                 )
                             )
@@ -84,8 +87,9 @@ class CoreMLAnalyzer:
                 findings.append(
                     Finding(
                         rule_id="COREML-CUSTOM-OPERATOR-FLAGGED",
+                        title="Untrusted Custom CoreML Operator Layer",
                         severity=RiskLevel.HIGH,
-                        message=f"Untrusted custom CoreML operator layer detected: {custom_type}",
+                        description=f"Untrusted custom CoreML operator layer detected: {custom_type}",
                         location=source_name,
                     )
                 )
@@ -101,8 +105,9 @@ class CoreMLAnalyzer:
                 findings.append(
                     Finding(
                         rule_id="COREML-PATH-TRAVERSAL-IN-MANIFEST",
+                        title="Path Traversal in CoreML Manifest",
                         severity=RiskLevel.CRITICAL,
-                        message=f"Path traversal sequence detected in CoreML manifest item: {path_val}",
+                        description=f"Path traversal sequence detected in CoreML manifest item: {path_val}",
                         location=path,
                     )
                 )
