@@ -61,13 +61,13 @@ class vLLMAdmissionGuard:
         # Perform static scan
         eval_result, scanned_files = self.engine.scan_path(model_path)
         if not eval_result.passed:
-            first_viol = eval_result.violations[0].description if eval_result.violations else "Policy check failed"
+            first_viol = eval_result.violations[0].message if eval_result.violations else "Policy check failed"
             return GuardVerdict(
                 admitted=False,
                 model_identifier=model_path,
                 rejection_reason=f"Security scan rejected model: {first_viol}",
                 violation_count=len(eval_result.violations),
-                details={"violations": [v.to_dict() for v in eval_result.violations]},
+                details={"violations": [v.message for v in eval_result.violations]},
             )
 
         return GuardVerdict(
