@@ -10,6 +10,7 @@ from scanner.analyzers.onnx_analyzer import ONNXAnalyzer
 from scanner.analyzers.pickle_inspector import PickleInspector
 from scanner.analyzers.pytorch_analyzer import PyTorchAnalyzer
 from scanner.analyzers.safetensors_checker import SafetensorsChecker
+from scanner.analyzers.tabular_model_analyzer import TabularModelAnalyzer
 from scanner.analyzers.torchscript_analyzer import TorchScriptAnalyzer
 
 __all__ = [
@@ -21,5 +22,6 @@ __all__ = [
     "PyTorchAnalyzer",
     "ONNXAnalyzer",
     "SafetensorsChecker",
+    "TabularModelAnalyzer",
     "TorchScriptAnalyzer",
 ]
