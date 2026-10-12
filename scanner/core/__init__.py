@@ -8,10 +8,12 @@ from scanner.core.github_summary import GitHubStepSummaryReporter
 from scanner.core.html_reporter import HTMLReporter
 from scanner.core.parallel_scanner import ParallelModelScanner
 from scanner.core.reporter import Reporter
+from scanner.core.scoring import CVSSScoringEngine
 
 __all__ = [
     "ModelScanEngine",
     "CSVReporter",
+    "CVSSScoringEngine",
     "GitHubStepSummaryReporter",
     "HTMLReporter",
     "ParallelModelScanner",
