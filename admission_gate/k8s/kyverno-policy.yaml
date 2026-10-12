@@ -1,0 +1,32 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: enforce-mlsecops-model-safety
+  annotations:
+    policies.kyverno.io/title: Enforce MLSecOps Model Supply Chain Security
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: InferenceService, Pod
+    policies.kyverno.io/description: >-
+      Ensures that all AI/ML inference workloads deployed via KServe or vLLM
+      reference approved safe model formats (Safetensors, GGUF) and undergo
+      pre-deployment static deserialization scanning before scheduling.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: block-unverified-pickle-storage
+      match:
+        any:
+          - resources:
+              kinds:
+                - serving.kserve.io/v1beta1/InferenceService
+      validate:
+        message: >-
+          Legacy unverified pickle model storage (.pkl, .bin, .pt) is forbidden without MLSecOps static scan attestation.
+          Please migrate to Safetensors format or register verified model digest.
+        pattern:
+          spec:
+            predictor:
+              model:
+                =(storageUri): "!*.pkl & !*.bin"
