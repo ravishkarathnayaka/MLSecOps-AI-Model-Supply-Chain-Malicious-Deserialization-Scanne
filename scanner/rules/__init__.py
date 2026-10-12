@@ -10,6 +10,7 @@ from scanner.rules.dangerous_symbols import (
     RiskLevel,
     SymbolRule,
 )
+from scanner.rules.network_rules import NETWORK_EXFILTRATION_RULES
 from scanner.rules.policy_engine import EvaluationResult, PolicyEngine, PolicyViolation
 from scanner.rules.torchscript_rules import DANGEROUS_TORCHSCRIPT_OPS, SAFE_ATEN_PREFIXES
 
@@ -19,6 +20,7 @@ __all__ = [
     "KNOWN_SAFE_GLOBALS",
     "DANGEROUS_TORCHSCRIPT_OPS",
     "SAFE_ATEN_PREFIXES",
+    "NETWORK_EXFILTRATION_RULES",
     "RiskLevel",
     "SymbolRule",
     "PolicyEngine",
