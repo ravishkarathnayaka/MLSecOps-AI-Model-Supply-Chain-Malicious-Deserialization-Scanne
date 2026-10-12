@@ -1,0 +1,1 @@
+{"version": [1, 7, 0], "learner": {"objective": {"name": "reg:squarederror"}, "attributes": {}}}
