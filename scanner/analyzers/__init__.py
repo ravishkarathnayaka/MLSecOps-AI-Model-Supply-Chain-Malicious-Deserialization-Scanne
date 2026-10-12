@@ -12,6 +12,7 @@ from scanner.analyzers.pytorch_analyzer import PyTorchAnalyzer
 from scanner.analyzers.safetensors_checker import SafetensorsChecker
 from scanner.analyzers.tabular_model_analyzer import TabularModelAnalyzer
 from scanner.analyzers.torchscript_analyzer import TorchScriptAnalyzer
+from scanner.analyzers.weight_distribution_analyzer import WeightDistributionAnalyzer
 
 __all__ = [
     "EntropyAnalyzer",
@@ -24,4 +25,5 @@ __all__ = [
     "SafetensorsChecker",
     "TabularModelAnalyzer",
     "TorchScriptAnalyzer",
+    "WeightDistributionAnalyzer",
 ]
