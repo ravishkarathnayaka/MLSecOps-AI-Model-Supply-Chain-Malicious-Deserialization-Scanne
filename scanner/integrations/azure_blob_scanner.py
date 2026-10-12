@@ -8,7 +8,7 @@ import io
 import re
 from typing import Any, Dict, List, Optional
 
-from scanner.core.engine import MasterEngine
+from scanner.core.engine import ModelScanEngine
 from scanner.rules.policy_engine import EvaluationResult, PolicyEngine
 
 
@@ -32,8 +32,7 @@ class AzureBlobScanner:
         self.connection_string = connection_string
         self.account_url = account_url
         self.client = blob_service_client
-        self.engine = MasterEngine()
-        self.policy_engine = PolicyEngine()
+        self.engine = ModelScanEngine()
 
     @staticmethod
     def parse_azure_uri(uri: str) -> tuple[str, str]:
@@ -52,9 +51,8 @@ class AzureBlobScanner:
         fail_on_severity: str = "HIGH",
     ) -> EvaluationResult:
         """Inspects in-memory streamed blob bytes against security rules."""
-        file_ext = "." + blob_name.rsplit(".", 1)[-1].lower() if "." in blob_name else ""
-        findings = self.engine.scan_bytes(blob_bytes, file_ext=file_ext, source_name=f"az://{container}/{blob_name}")
-        return self.policy_engine.evaluate(findings, fail_on=fail_on_severity)
+        file_ext = blob_name.rsplit(".", 1)[-1].lower() if "." in blob_name else "pkl"
+        return self.engine.scan_bytes(blob_bytes, format_hint=file_ext, source_name=f"az://{container}/{blob_name}")
 
     def scan_container_prefix(
         self,
