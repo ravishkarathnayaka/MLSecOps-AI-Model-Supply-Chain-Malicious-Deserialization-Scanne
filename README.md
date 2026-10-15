@@ -457,6 +457,16 @@ MLSecOps provides comprehensive scanning across modern ML ecosystems:
 - **GGUF (`.gguf`):** Validates llama.cpp/Ollama GGUF header formats, tensor metadata alignment, and malicious key strings.
 - **Keras H5 (`.keras`, `.h5`):** Static HDF5 traversal checking for embedded `Lambda` layers and arbitrary Python bytecode injection.
 - **Tabular Models (XGBoost / LightGBM):** Traverses tree attributes and JSON schemas for deserialization hooks and arbitrary base64 payload execution.
+- **JAX / Flax (`.msgpack`, `.flax`):** MessagePack binary deserializer inspecting custom extension types and payload injections.
+- **Baidu PaddlePaddle (`.pdmodel`, `.pdparams`):** Traverses computation graph operators and flags legacy unpickling vectors.
+- **Apache MXNet (`-symbol.json`, `.params`):** Validates symbol graph operators and NDArray buffer bounds.
+- **NVIDIA TensorRT (`.plan`, `.engine`):** Binary plan validator detecting dynamic external library references (`.so`).
+- **Intel OpenVINO (`.xml`, `.bin`):** XML topology scanner detecting XXE payloads and weight buffer boundary overflows.
+
+### Threat Framework & Compliance Taxonomy
+All findings and policy engine evaluations correlate with leading threat matrices:
+- **MITRE ATLAS™:** Correlated to techniques such as `AML.T0010` (ML Supply Chain Compromise), `AML.T0018` (Backdoor ML Model), and `AML.T0043` (Adversarial Prompt Injection).
+- **OWASP Top 10 for LLMs:** Full coverage across `LLM01` (Prompt Injection), `LLM04` (Model Denial of Service), and `LLM05` (Supply Chain Vulnerabilities).
 
 ### Cloud Storage & Registry Scanning
 Scan model artifacts stored across distributed object stores without pre-downloading entire multi-gigabyte files:
@@ -466,6 +476,9 @@ mlsec-scan --s3 s3://production-models-bucket/resnet50/ --fail-on high
 
 # Stream-scan Google Cloud Storage
 mlsec-scan --gcs gs://ai-checkpoints-prod/llm-weights/ --fail-on high
+
+# Stream-scan Azure Blob Storage
+mlsec-scan --azure az://ai-checkpoints-prod/llm-weights/ --fail-on high
 
 # Audit MLflow Model Registry
 mlsec-scan --mlflow http://mlflow.internal:5000 --model-name FraudClassifier --stage Production
@@ -479,6 +492,9 @@ mlsec-scan --path ./models/model.safetensors --aibom-cyclonedx ./bom/model.cyclo
 
 # Generate SPDX v2.3 SBOM
 mlsec-scan --path ./models/model.safetensors --aibom-spdx ./bom/model.spdx.json
+
+# Generate SLSA v1.0 Provenance Attestation
+mlsec-scan --path ./models/model.safetensors --slsa-attestation ./bom/model.slsa.json
 ```
 
 ### Kubernetes Native Policy Enforcement (Kyverno & OPA Gatekeeper)
@@ -486,8 +502,14 @@ Install production admission controls via Helm or native Kubernetes policies:
 - **Helm Chart:** `k8s/helm/mlsecops-admission` with automated mTLS certificate rotation.
 - **Kyverno ClusterPolicy:** `k8s/kyverno-model-policy.yaml` blocks unverified pods at admission time.
 - **OPA Gatekeeper:** `k8s/opa-gatekeeper-constraint.yaml` validates model image digests and provenance attestations.
+- **Envoy ext_authz:** Zero-trust service mesh sidecar filter for Istio/Envoy inference clusters.
 
 ### Extended Documentation
+- [MITRE ATLAS & OWASP Top 10 for LLM Threat Mapping](docs/mitre_atlas_owasp_guide.md)
+- [Enterprise Edge & Mobile Model Security Guide (CoreML, OpenVINO, TensorRT)](docs/edge_model_security_guide.md)
+- [Kubernetes Envoy ext_authz & Service Mesh Guide](docs/envoy_service_mesh_guide.md)
+- [CoreML & TensorFlow SavedModel Architecture Guide](docs/coreml_savedmodel_guide.md)
+- [Azure Cloud Storage & vLLM Serving Guide](docs/azure_vllm_guide.md)
 - [AI Bill of Materials (AIBOM) & Provenance Guide](docs/aibom_guide.md)
 - [Triton Inference Server Security Integration Guide](docs/triton_guide.md)
 - [Enterprise Deployment & Incident Response Runbook](docs/runbook.md)
